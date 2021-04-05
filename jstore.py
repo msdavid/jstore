@@ -66,7 +66,7 @@ class JsonSG:
         try:
             result = eval(f"jobject{arg}",{"__builtins__":None},{'jobject':self.jobject})
             if not pprint:
-                return json.dumps(result)
+                return result
             else:
                 return json.dumps(result, indent=2, sort_keys=True)
         except Exception:
