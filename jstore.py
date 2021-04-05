@@ -33,7 +33,7 @@ class JsonSG:
         fp.write(json.dumps(self.jobject, indent=4, sort_keys=True))
         fp.close()
 
-    def jset(self,arg):
+    def jset(self,arg, pprint=False):
         try:
             if search("\[\.\.\]\\s*=\s*", arg): #append new item to list
                 arg = split("\[\.\.\]\\s*=\s*", arg)
@@ -54,15 +54,21 @@ class JsonSG:
             if self.file:
                 self.save()
                 return True
-            return json.dumps(self.jobject)
+            if not pprint:
+                return json.dumps(self.jobject)
+            else:
+                return json.dumps(self.jobject, indent=2, sort_keys=True)
         except Exception:
             print("ERROR mal-formated, not found or out of range update", file=stderr)
             return None
 
-    def jget(self, arg):
+    def jget(self, arg, pprint=False):
         try:
             result = eval(f"jobject{arg}",{"__builtins__":None},{'jobject':self.jobject})
-            return json.dumps(result)
+            if not pprint:
+                return json.dumps(result)
+            else:
+                return json.dumps(result, indent=2, sort_keys=True)
         except Exception:
             print("ERROR mal-formated, not found or out of range query", file=stderr)
             return None
