@@ -11,7 +11,7 @@ class JsonSG:
         self.file = file
         if file:
             self.load(file)
-        if jstr:
+        elif jstr:
             try:
                 self.jobject = json.loads(jstr)
             except Exception:
