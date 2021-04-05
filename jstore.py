@@ -4,12 +4,21 @@ import json
 from sys import argv, exit, stderr
 from os.path import exists
 from re import split, search
+from typing import List
 
 class JsonSG:
-    def __init__(self, file):
-        self.jobject = {}
+    def __init__(self, file=None, jstr=None):
         self.file = file
-        self.load(file)
+        if file:
+            self.load(file)
+        if jstr:
+            try:
+                self.jobject = json.loads(jstr)
+            except Exception:
+                self.jobject = {}
+                print("ERROR mal-formated, not found or out of range update", file=stderr)
+        else:
+            self.jobject = {}
 
     def load(self, file):
         if exists(file):
@@ -26,34 +35,43 @@ class JsonSG:
 
     def jset(self,arg):
         try:
-            if search("\[\.\.\]\\s*=\s*", arg):
+            if search("\[\.\.\]\\s*=\s*", arg): #append new item to list
                 arg = split("\[\.\.\]\\s*=\s*", arg)
-                arg = f"jobject{arg[0]}.append({arg[1]})"     
+                pre = f"jobject.get({arg[0][1:-1]})"
+                val = eval(pre, {"__builtins__":None},{'jobject':self.jobject})
+                if type(val) != list:
+                   arg = f"jobject{arg[0]}=[{arg[1]}]"
+                else:
+                    arg = f"jobject{arg[0]}.append({arg[1]})"     
+
             elif search("\[\-\-\]", arg):
                 arg = split("\[\-\-\]", arg)
                 arg = f"del jobject{arg[0]}"
+
             else:
                 arg = f"jobject{arg}"
             exec(arg, {"__builtins__":None},{'jobject':self.jobject})
-            self.save()
-            return True
+            if self.file:
+                self.save()
+                return True
+            return json.dumps(self.jobject)
         except Exception:
             print("ERROR mal-formated, not found or out of range update", file=stderr)
-            return False
+            return None
 
     def jget(self, arg):
         try:
             result = eval(f"jobject{arg}",{"__builtins__":None},{'jobject':self.jobject})
-            return result
+            return json.dumps(result)
         except Exception:
             print("ERROR mal-formated, not found or out of range query", file=stderr)
-            return ""
+            return None
 
 if __name__ == "__main__":
     try:
-        cmd = argv[1]
-        arg = argv[2]
-        file = argv[3]
+        file = argv[1]
+        cmd = argv[2]
+        arg = argv[3]
     except Exception:
         print("not enough arguments", file=stderr)
         exit(255)
