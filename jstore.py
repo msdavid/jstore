@@ -5,6 +5,14 @@ from sys import argv, exit, stderr
 from os.path import exists
 from re import split, search
 from typing import List
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("filename", help="Name of the json file. if it doesn'texist. it is created")
+parser.add_argument("cmd", help="set or get", choices=['set', 'get'])
+parser.add_argument("querystring", help="query string")
+parser.add_argument("-j", "--json", help="returns json formated resuts ", action="store_true")
+args = args = parser.parse_args()
 
 class JsonSG:
     def __init__(self, file=None, jstr=None):
@@ -78,22 +86,11 @@ class JsonSG:
             return None
 
 if __name__ == "__main__":
-    try:
-        file = argv[1]
-        cmd = argv[2]
-        arg = argv[3]
-    except Exception:
-        print("not enough arguments", file=stderr)
-        exit(255)
-    jsg = JsonSG(file)
-    if cmd == 'set':
-        exitc = jsg.jset(arg)
+    jsg = JsonSG(args.filename)
+    if args.cmd == 'set':
+        exitc = jsg.jset(args.querystring)
         if not exitc:
             exit(254)
-    elif cmd == 'get':
-        print(jsg.jget(arg, raw=True))
-    else:
-        print(f"unknown command: {cmd}", file=stderr)
-        exit(252)
-    
+    elif args.cmd == 'get':
+        print(jsg.jget(args.querystring, raw=(not args.json)))
     
