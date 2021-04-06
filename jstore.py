@@ -7,13 +7,6 @@ from re import split, search
 from typing import List
 import argparse
 
-parser = argparse.ArgumentParser()
-parser.add_argument("filename", help="Name of the json file. if it doesn'texist. it is created")
-parser.add_argument("cmd", help="set or get", choices=['set', 'get'])
-parser.add_argument("querystring", help="query string")
-parser.add_argument("-j", "--json", help="returns json formated resuts ", action="store_true")
-args = args = parser.parse_args()
-
 class JsonSG:
     def __init__(self, file=None, jstr=None):
         self.file = file
@@ -86,6 +79,12 @@ class JsonSG:
             return None
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filename", help="Name of the json file. if it doesn'texist. it is created")
+    parser.add_argument("cmd", help="set or get", choices=['set', 'get'])
+    parser.add_argument("querystring", help="query string")
+    parser.add_argument("-j", "--json", help="returns json formated resuts ", action="store_true")
+    args = args = parser.parse_args()
     jsg = JsonSG(args.filename)
     if args.cmd == 'set':
         exitc = jsg.jset(args.querystring)
